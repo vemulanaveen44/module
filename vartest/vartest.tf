@@ -4,39 +4,17 @@ provider "aws" {
 }
 
 
-resource "aws_vpc" "naveen_vpc" {
-  cidr_block       = var.vpc_cidr
-  instance_tenancy = "default"
-  enable_dns_hostnames = true
-  enable_dns_support = true
-
- tags = {
-    Name = "naveen_vpc"
-  }
-}
-
-output "listout" {
-    
-
-    value = [var.list[0], var.list[1]]
-    
+# count examples it will create 3 users with like user1 user2 user3
+resource "aws_iam_user" "iamuser" {
+    #name = "user${count.index}"
+    name = var.iamusers[count.index]
+    path = "/system"
+    count = 3
   
 }
-
-output "map" {
-  value = var.exmap["small"]
-}
-
-  resource "aws_subnet" "naveen_private_subnet" {
-      count = length(data.aws_availability_zones.azs.names)
-    vpc_id = aws_vpc.naveen_vpc.id
-    cidr_block = element(var.subnet_cidr,count.index)
-    availability_zone = element(data.aws_availability_zones.azs.names,count.index)
+variable "iamusers" {
+    type = list
+    default = ["naveen","lucky","nikhil"]
   
-    tags = {
-        Name = "naveen_private-${count.index+1}"
-        
-    }
 }
-
 
