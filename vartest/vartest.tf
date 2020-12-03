@@ -3,38 +3,24 @@ provider "aws" {
     
      
 }
-
-# count examples it will create 3 users with like user1 user2 user3
-/*
-resource "aws_iam_user" "iamuser" {
-    #name = "user${count.index}"
-    name = var.iamusers[count.index]
-    path = "/system"
-    count = 3
-  
-}
-*/
-variable "iamusers" {
+variable "allports" {
     type = list
-    default = ["naveen","lucky","nikhil"]
+    default = [22,443,80,8080,9200,53]
   
 }
 
-# count with with condition
-variable "istest" {
-    default=false
-}
-resource "aws_iam_user" "true" {
-    name = "naveen1"
-    path = "/system"
-    count = var.istest == true ? 1 : 0
-}
-resource "aws_iam_user" "false" {
-    name = var.iamusers[count.index]
-    path = "/system"
-    count = var.istest == false ? 3 : 0
+resource "aws_security_group" "nscg" {
+    name = "allow_tls"
+    dynamic "ingress" {
+       for_each = var.allports
+       content  {
+           from_port = ingress.value
+           to_port = ingress.value
+           protocol = "tcp"
+           cidr_blocks = ["0.0.0.0/0"]
+       }
+    }
+
   
 }
-
-
 
