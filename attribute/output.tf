@@ -202,11 +202,12 @@ resource "aws_route_table" "siva_route" {
       cidr_block = "0.0.0.0/0"
       gateway_id = aws_internet_gateway.siva_gw.id
       
-    } 
+    }
+    
 }
 resource "aws_route_table_association" "siva_private_subnet" {
   subnet_id     = aws_subnet.siva_private_subnet.id
-  route_table_id = aws_vpc.siva_vpc.main_route_table_id
+  route_table_id = aws_route_table.siva_route.id
   
 }
 
