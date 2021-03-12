@@ -91,23 +91,57 @@ resource "aws_instance" "sivaec2" {
   key_name                    = "siva-key"
 
   
-  provisioner "remote-exec" {
-    inline = [
-      "sudo amazon-linux-extras install -y nginx1.12",
-      "sudo systemctl start nginx.service",
-      "sudo rpm -qa |grep -i nginx"
-    ]
+  
+    
+    provisioner "file" {
+        source = "./test"
+        destination = "/tmp/test"
+        connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("./private.ppk")
+      host        = self.public_ip
+    }
+    }
+    provisioner "file" {
+    content     = "ami used: ${self.public_ip}"
+    destination = "/tmp/test1"
     connection {
       type        = "ssh"
       user        = "ec2-user"
       private_key = file("./private.ppk")
       host        = self.public_ip
     }
+    }
+     provisioner "remote-exec" {
+    inline = [
+      "cat /tmp/test",
+      "cat /tmp/test1"
 
-  }
-
-tags = {
-    Name = "siva_ec2"
-
-  }
+      
+    ]
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("./private.ppk")
+      host        = self.public_ip
+    
+     }
+    
+     
+  
+     }
+     provisioner "local-exec" {
+        command = "echo ${aws_instance.sivaec2.public_ip} > a.txt "
+     }
 }
+
+
+
+
+
+
+    
+
+    
+
